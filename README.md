@@ -336,3 +336,19 @@
 10. You can see that there are no rows on the table when you login as Customer role because we still didn't insert the data; table inside database is still empty. Moreover, if you login as Admin role, you can see that the table shows list of product that you insert when you migrate database on [Part_3_Identity](https://github.com/RazorPageTraining/Part_3_Identity).
 
 11. [Back to Menu](#create-read-update-delete)
+</BR>
+
+#### Insert
+
+0. [Back to Menu](#create-read-update-delete)
+</BR>
+
+#### Update
+
+0. [Back to Menu](#create-read-update-delete)
+</BR>
+
+#### Delete
+
+0. [Back to Menu](#create-read-update-delete)
+</BR>
