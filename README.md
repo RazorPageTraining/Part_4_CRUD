@@ -8,7 +8,8 @@
 | 4 | [Net 5 CRUD](https://github.com/muhamaddarulhadi/RazorPage) ***(Example ONLY)***|
 | 5 | [How to run this project](#how-to-run-this-project) |
 | 6 | [Insert Library](#insert-library) |
-| 7 | [CRUD code](#crud-code) </br> - [View](#view) </br> - [Insert](#insert) </br> - [Update](#update) </br> - [Delete](#delete) |
+| 7 | [Edit Login Partial](#edit-login-partial) |
+| 8 | [CRUD code](#crud-code) </br> - [View](#view) </br> - [Insert](#insert) </br> - [Update](#update) </br> - [Delete](#delete) |
 
 
 </BR>
@@ -77,6 +78,29 @@
 
 ***
 
+### Edit Login Partial
+
+1. We need to edit file ***_LoginPartial.cshtml*** inside folder Pages > Shared. This is because there is some error when redirect link to logout.
+
+   > ![image](https://user-images.githubusercontent.com/47632993/206103306-489240e6-dd5f-4324-b6a7-18a7abba45c5.png)
+   
+2. Open ***_LoginPartial.cshtml*** and edit this line as below :
+
+   From :
+   > ![image](https://user-images.githubusercontent.com/47632993/206102829-aca3e6d2-0ac8-4be8-ba0e-fb1d9c90c2d4.png)
+   
+   TO :
+   > ![image](https://user-images.githubusercontent.com/47632993/206102919-476978e0-18b9-4460-8a14-a898a815fd17.png)
+   
+   ```HTML+Razor
+   <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl='@Url.Page("/Account/Login", new { area = "Identity" })' method="post" >
+   ```
+3. Save the file.
+4. [Back to Menu](#create-read-update-delete)
+</BR>
+
+***
+
 ### [CRUD](https://www.sumologic.com/glossary/crud/#:~:text=CRUD%20Meaning%3A%20CRUD%20is%20an,%2C%20read%2C%20update%20and%20delete.) Code
 
 
@@ -103,27 +127,58 @@
            <table id="data" class="display table table-striped table-bordered">
                <thead>
                    <tr>
-                       <th class="text-center col-md-2">NO</th>
-                       <th class="text-left col-md-5">PRODUCT NAME</th>
-                       <th class="text-center col-md-3">PRODUCT QUANTITY</th>
-                       <th class="text-center col-md-2">TOTAL PRICE</th>
+                       @if(User.IsInRole("SystemAdmin"))
+                       {
+                           <th class="text-center col-md-2 dont-sort">NO</th>
+                           <th class="text-center col-md-5 sort-this">PRODUCT NAME</th>
+                           <th class="text-center col-md-3">PRICE</th>
+                           <th class="text-center col-md-2"></th>
+                       }
+                       else if(User.IsInRole("Customer"))
+                       {
+                           <th class="text-center col-md-2 dont-sort">NO</th>
+                           <th class="text-center col-md-5 sort-this">PRODUCT NAME</th>
+                           <th class="text-center col-md-3">QUANTITY</th>
+                           <th class="text-center col-md-2">TOTAL PRICE</th>
+                           <th class="text-center col-md-2"></th>
+                       }
                    </tr>
                </thead>
                <tbody>
-                   @for(int i=0; i<Model.custProducts.Count(); i++)
+                   @if(User.IsInRole("SystemAdmin"))
                    {
-                       <tr>
-                           <td class="text-center"></td>
-                           <td class="text-left">@Model.custProducts[i].Name</td>
-                           <td class="text-center">@Model.custProducts[i].Quantity</td>
-                           <td class="text-center">@Model.custProducts[i].TotalPrice</td>
-                           <form id="product" method="post">
-                               <td class="text-center">
-                                   <a class="btn btn-link" asp-page="Manage" asp-page-handler="Update" asp-route-id="@Model.custProducts[i].Id"><i class="fa fa-edit" aria-hidden="true"></i></a>
-                                   <button class="btn btn-link text-danger" asp-page-handler="Delete" asp-route-id="@Model.custProducts[i].Id" type="submit"><i class="fa fa-trash" aria-hidden="true"></i></button>
-                               </td>
-                           </form>
-                       </tr>
+                       @for(int i=0; i<Model.products.Count(); i++)
+                       {
+                           <tr>
+                               <td class="text-center"></td>
+                               <td class="text-center">@Model.products[i].Name</td>
+                               <td class="text-center">RM @string.Format("{0:F2}", (@Model.products[i].Price))</td>
+                               <form id="product" method="post">
+                                   <td class="text-center">
+                                       <a class="btn btn-link" asp-page="Manage" asp-page-handler="Update" asp-route-id="@Model.products[i].Id"><i class="fa fa-edit" aria-hidden="true"></i></a>
+                                       <button class="btn btn-link text-danger" asp-page-handler="Delete" asp-route-id="@Model.products[i].Id" type="submit"><i class="fa fa-trash" aria-hidden="true"></i></button>
+                                   </td>
+                               </form>
+                           </tr>
+                       }
+                   }
+                   else if(User.IsInRole("Customer"))
+                   {
+                       @for(int i=0; i<Model.custProducts.Count(); i++)
+                       {
+                           <tr>
+                               <td class="text-center"></td>
+                               <td class="text-center">@Model.custProducts[i].Name</td>
+                               <td class="text-center">@Model.custProducts[i].Quantity</td>
+                               <td class="text-center">RM @string.Format("{0:F2}", (@Model.custProducts[i].TotalPrice))</td>
+                               <form id="product" method="post">
+                                   <td class="text-center">
+                                       <a class="btn btn-link" asp-page="Manage" asp-page-handler="Update" asp-route-id="@Model.custProducts[i].Id"><i class="fa fa-edit" aria-hidden="true"></i></a>
+                                       <button class="btn btn-link text-danger" asp-page-handler="Delete" asp-route-id="@Model.custProducts[i].Id" type="submit"><i class="fa fa-trash" aria-hidden="true"></i></button>
+                                   </td>
+                               </form>
+                           </tr>
+                       }
                    }
                </tbody>
            </table>
@@ -151,7 +206,7 @@
 
    namespace TrainingRazor.Pages;
 
-   //THIS VIEW CLASS MODEL
+   //THIS VIEW VIEW-MODEL
    public class IndexModel : BaseModel
    {
        private readonly ApplicationDbContext _context; //CONNECTION FOR DATABASE
@@ -162,36 +217,45 @@
        }
 
        public List<CustProduct> custProducts { get; set; } //ENTITY VARIABLE DECLARATION
+       public List<Product> products { get; set; } //ENTITY VARIABLE DECLARATION
 
        public async Task<ActionResult> OnGet()
        {
-           var currentUser = await GetCurrentUser();   //GET CURRENT USER FROM METHOD CLASS
-
-           custProducts = new List<CustProduct>(); //CREATE NEW LIST
-
-           //GET DATA FROM DATABASE
-           var data = await _context.CustPurchaseds.Include(x => x.Creator)    //INCLUDE OTHER TABLE
-                                                   .Include(x => x.Product)    //INCLUDE OTHER TABLE
-                                                   .Where(x => x.Creator == currentUser)   //GET DATA ONLY FROM CURRENT USER AUTHENTICATION
-                                                   .ToListAsync();
-
-           if(data!=null)  //CHECK AVAILABILITY OF DATA
+           if(User.IsInRole("Customer"))   //LOAD DATA BY USER ROLE
            {
-               for(int i=0; i< data.Count(); i++)  //LOOP DATA
+               var currentUser = await GetCurrentUser();   //GET CURRENT USER FROM METHOD CLASS
+
+               custProducts = new List<CustProduct>(); //CREATE NEW LIST
+
+               //GET DATA FROM DATABASE
+               var data = await _context.CustPurchaseds.Include(x => x.Creator)    //INCLUDE OTHER TABLE
+                                                       .Include(x => x.Product)    //INCLUDE OTHER TABLE
+                                                       .Where(x => x.Creator == currentUser)   //GET DATA ONLY FROM CURRENT USER AUTHENTICATION
+                                                       .ToListAsync();
+
+               if(data!=null)  //CHECK AVAILABILITY OF DATA
                {
-                   var totalPrice = data[i].Product.Price * data[i].Quantity;  //CALCULATE TOTAL PRICE
-
-                   //INSERT DATA INTO LIST
-                   var custProduct = new CusProduct()
+                   for(int i=0; i< data.Count(); i++)  //LOOP DATA
                    {
-                       Id = data[i].Id,
-                       Name = data[i].Product.Name,
-                       Quantity = data[i].Quantity,
-                       PrivacyModel = totalPrice,
-                   };
+                       var totalPrice = data[i].Product.Price * data[i].Quantity;  //CALCULATE TOTAL PRICE
 
-                   custProducts.Add(custProduct);
+                       //INSERT DATA INTO LIST
+                       var custProduct = new CustProduct()
+                       {
+                           Id = data[i].Id,
+                           Name = data[i].Product.Name,
+                           Quantity = data[i].Quantity ?? 0,
+                           TotalPrice = totalPrice,
+                       };
+
+                       custProducts.Add(custProduct);
+                   }
                }
+           }
+           else if(User.IsInRole("SystemAdmin"))   //LOAD DATA BY USER ROLE
+           {
+               products = new List<Product>();     //CREATE NEW LIST
+               products = await _context.Products.ToListAsync();   //GET DATA FROM DATABASE
            }
 
            return Page();
@@ -269,6 +333,6 @@
 
 9. You can try run the web application first to see whether there is error or not. Click FN + F5 on your keyboard or just F5, depends on your keyboard.
 
-10. You can see that there are no rows on the table because we still didn't insert the data; table inside database is still empty.
+10. You can see that there are no rows on the table when you login as Customer role because we still didn't insert the data; table inside database is still empty. Moreover, if you login as Admin role, you can see that the table shows list of product that you insert when you migrate database on [Part_3_Identity](https://github.com/RazorPageTraining/Part_3_Identity).
 
 11. [Back to Menu](#create-read-update-delete)
