@@ -28,7 +28,7 @@
    ``` 
    > ![image](https://user-images.githubusercontent.com/47632993/204572344-4005b6a9-2cdc-468c-804a-6338a70b0972.png)
 
-3. "TrainingRazor" name on this command is the folder name of the project. The name is depends on you.
+3. "TrainingRazor" name on this command is the folder name of the project. The name depends on you.
 4. System will open the project on your Code Editor.
 5. Other than that, by using VS Code, you can just drag project folder on VS Code and and trust the author.     
 6. If VS Code authorize you to insert some assets, just click ***Yes/Accept***    
@@ -216,7 +216,7 @@
            _context = context;
        }
 
-       public List<CustProduct> custProducts { get; set; } //ENTITY VARIABLE DECLARATION
+       public List<CustProductModel> custProducts { get; set; } //ENTITY VARIABLE DECLARATION
        public List<Product> products { get; set; } //ENTITY VARIABLE DECLARATION
 
        public async Task<ActionResult> OnGet()
@@ -225,7 +225,7 @@
            {
                var currentUser = await GetCurrentUser();   //GET CURRENT USER FROM METHOD CLASS
 
-               custProducts = new List<CustProduct>(); //CREATE NEW LIST
+               custProducts = new List<CustProductModel>(); //CREATE NEW LIST
 
                //GET DATA FROM DATABASE
                var data = await _context.CustPurchaseds.Include(x => x.Creator)    //INCLUDE OTHER TABLE
@@ -240,7 +240,7 @@
                        var totalPrice = data[i].Product.Price * data[i].Quantity;  //CALCULATE TOTAL PRICE
 
                        //INSERT DATA INTO LIST
-                       var custProduct = new CustProduct()
+                       var custProduct = new CustProductModel()
                        {
                            Id = data[i].Id,
                            Name = data[i].Product.Name,
@@ -290,7 +290,7 @@
    ```C#
    namespace TrainingRazor.Models
    {
-       public class CustProduct
+       public class CustProductModel
        {
            public int Id { get; set; }
            public string Name { get; set; }
@@ -339,6 +339,21 @@
 </BR>
 
 #### Insert
+
+1. Now, we gonna create a new page call Manage.
+2. Right click on folder Pages, click New C#, then, click Razor Page.
+   
+   > ![image](https://user-images.githubusercontent.com/47632993/206109703-a6d9f556-57cf-4ec7-bfe3-83f8b17ef87e.png)
+
+3. Below alert will popup; insert ***Manage*** and click Enter button on keyboard.
+4. You can see on Pages folder, there are 2 new file called Manage.cshtml ***(View)*** and Manage.cshtml.cs ***(View-Model)***
+
+   > ![image](https://user-images.githubusercontent.com/47632993/206110357-0daed18c-50a7-4598-a94c-1cadbc76838a.png)
+
+5. Open Manage.cshtml and replace with this code :
+
+   ```HTML+Razor
+   ```
 
 0. [Back to Menu](#create-read-update-delete)
 </BR>
