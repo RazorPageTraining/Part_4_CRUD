@@ -116,9 +116,11 @@
        ViewData["Title"] = "Home page";
    }
 
-   <div class="text-center col-md-12">
-       <h1 class="display-3 mt-3">Training Razor</h1>
-       <p>This Project consist of Create, Read, Update and Delete process.</p>
+   <div>
+       <div class="text-center mt-4">
+           <h1>Training Razor</h1>
+           <p>This Project consist of Create, Read, Update and Delete process.</p>
+       </div>
 
        <div align="left" class="mt-5 mb-4">
            <a asp-page="Manage" asp-page-handler="Insert" class="btn btn-primary">Insert</a>
@@ -346,16 +348,203 @@
    > ![image](https://user-images.githubusercontent.com/47632993/206109703-a6d9f556-57cf-4ec7-bfe3-83f8b17ef87e.png)
 
 3. Below alert will popup; insert ***Manage*** and click Enter button on keyboard.
-4. You can see on Pages folder, there are 2 new file called Manage.cshtml ***(View)*** and Manage.cshtml.cs ***(View-Model)***
+4. You can see on Pages folder, there are 2 new file created called Manage.cshtml ***(View)*** and Manage.cshtml.cs ***(View-Model)***
 
    > ![image](https://user-images.githubusercontent.com/47632993/206110357-0daed18c-50a7-4598-a94c-1cadbc76838a.png)
 
 5. Open Manage.cshtml and replace with this code :
 
    ```HTML+Razor
+   @page "{handler?}"
+   @model ManageModel
+   @{
+       ViewData["Title"] = "Manage";
+   }
+
+   <div>
+       <div class="mt-4"> 
+           <h1>
+               Insert Data
+           </h1>
+       </div>
+       <div class="mt-2">
+           <form method="post">
+               @if(User.IsInRole("Customer"))
+               {
+                   <input type="hidden" asp-for="InputCustPurchasing.Creator">
+                   <div class="form-group mt-3">
+                       <label asp-for="InputCustPurchasing.ProductId" class="col-form-label"></label>
+                       <select asp-for="InputCustPurchasing.ProductId" class="form-control">
+                           <option price="0.00" value="">Please Choose</option>
+                           @foreach(var item in Model.products)
+                           {
+                               <option price="@item.Price" value="@item.Id">@item.Name</option>
+                           }
+                       </select>
+                       <span asp-validation-for="InputCustPurchasing.ProductId" class="text-danger"></span>
+                   </div>
+                   <div class="form-group mt-3">
+                       <label asp-for="InputCustPurchasing.Quantity" class="col-form-label"></label>
+                       <input asp-for="InputCustPurchasing.Quantity" class="form-control">
+                       <span asp-validation-for="InputCustPurchasing.Quantity" class="text-danger"></span>
+                   </div>
+                   <div class="form-group mt-3">
+                       <label for="total-price" class="col-form-label">Total Price (RM)</label>
+                       <span id="total-price" class="form-control">0.00</span>
+                   </div>
+               }
+               else if(User.IsInRole("SystemAdmin"))
+               {
+                   <div class="form-group mt-3">
+                       <label asp-for="InputProduct.Name" class="col-form-label"></label>
+                       <input asp-for="InputProduct.Name" class="form-control">
+                       <span asp-validation-for="InputProduct.Name" class="text-danger"></span>
+                   </div>
+                   <div class="form-group mt-3">
+                       <label asp-for="InputProduct.Price" class="col-form-label"></label>
+                       <input asp-for="InputProduct.Price" class="form-control">
+                       <span asp-validation-for="InputProduct.Price" class="text-danger"></span>
+                   </div>
+               }
+
+               <div class="form-group mt-4">
+                   <a asp-page="/Index" class="btn btn-primary mr-3">Back</a>
+                   <button type="submit" class="btn btn-success ml-3">Save</button>
+               </div>
+           </form>
+       </div>
+   </div>
+
+   @section Scripts {
+       @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+        <script src="~/js/manage.js"></script>
+   }
    ```
 
-0. [Back to Menu](#create-read-update-delete)
+6. Then, open Manage.cshtml.cs and replace this code
+   
+   ```C#
+   using Microsoft.AspNetCore.Mvc;
+   using Microsoft.AspNetCore.Identity;
+   using Microsoft.EntityFrameworkCore;
+
+   using TrainingRazor.Data;
+   using TrainingRazor.Models;
+
+   namespace TrainingRazor.Pages
+   {
+       public class ManageModel : BaseModel   //REFER TO BASE CLASS MODEL  
+       {
+           private readonly ApplicationDbContext _context; //CONNECTION FOR DATABASE
+
+           public ManageModel(ApplicationDbContext context,  UserManager<ApplicationUser> userManager)  : base(userManager)  //REFER TO BASE CLASS MODEL
+           {
+               _context = context;
+           }
+
+           [BindProperty]  //MUST BIND INPUT MODEL FOR DATA TO REMAINS WHEN FORM IS POST
+           public InputCustPurchasingModel InputCustPurchasing { get; set; } //ENTITY VARIABLE DECLARATION
+
+           [BindProperty]
+           public InputProductModel InputProduct { get; set; } //ENTITY VARIABLE DECLARATION
+           public List<Product> products { get; set; }
+
+           public async Task<IActionResult> OnGetInsert()
+           {
+               var currentUser = await GetCurrentUser(); //CALL METHOD FROM BaseModel
+
+               if(User.IsInRole("Customer"))
+               {
+                   products = await _context.Products.ToListAsync();
+
+                   InputCustPurchasing = new InputCustPurchasingModel()
+                   {
+                       Creator =  currentUser
+                   };
+               }
+               else if(User.IsInRole("SystemAdmin"))
+               {
+                   InputProduct = new InputProductModel();
+               }
+
+               return Page();
+           }
+
+           public async Task<ActionResult> OnPost()
+           {
+               if(User.IsInRole("Customer"))
+               {
+                   //INSERT INPUT DATA FROM INPUT ENTITY MODEL, INSIDE DATABASE ENTITY MODEL
+                   var custPurchased = new CustPurchased()
+                   {
+                       Creator = InputCustPurchasing.Creator,
+                       ProductId = InputCustPurchasing.ProductId,
+                       Quantity = InputCustPurchasing.Quantity
+                   };
+
+                   await _context.CustPurchaseds.AddAsync(custPurchased); //ADD DATA
+               }
+               else if(User.IsInRole("SystemAdmin"))
+               {
+                   var product = new Product()
+                   {
+                       Name = InputProduct.Name,
+                       Price = InputProduct.Price
+                   };
+
+                   await _context.Products.AddAsync(product);
+               }
+
+               await _context.SaveChangesAsync();  //SAVE DATA INTO DATABASE
+
+               return RedirectToPage("Index");  //REDIRECT SYSTEM TO PAGE INDEX
+           }
+       }
+   }
+   ```
+
+7. Do not run the project yet, now, we gonna create a new js file inside js folder called ***manage.js***
+   
+   > ![image](https://user-images.githubusercontent.com/47632993/206129985-8e5ce5c7-4fa3-4f78-ac87-dca44968a7cd.png)
+
+8. Copy and paste this code inside file ***manage.js***
+   
+   ```JavaScript
+   (function ($)
+   {   
+       // KEY UP FUNCTION; CODE WILL RUN WHEN YOU ENTER VALUE ON KEYBOARD
+       $("#InputCustPurchasing_Quantity").keyup( function (e)
+       {   
+           Calculate();  //CALL METHOD
+       });
+
+       // CHANGE FUNCTION; CODE WILL RUN IF THERE ARE SOME CHANGES ON DROPDOWN
+       $("#InputCustPurchasing_ProductId").change( function (e)
+       {
+           Calculate();  //CALL METHOD 
+       });
+
+       $("#InputProduct_Price").blur(function(){
+           var value = parseFloat(this.value);
+           $(this).val(value.toFixed(2));
+       });
+
+   })(jQuery);
+
+   // CALCULATE FUNCTION
+   function Calculate() 
+   {
+       // GET VALUE FROM ATTRIBUTE IN ID BY FINDING THE ELEMENT OPTION THAT IS SELECTED
+       var price = parseFloat($("#InputCustPurchasing_ProductId").find('option:selected').attr('price'));  
+       var totalPrice = parseFloat($("#InputCustPurchasing_Quantity").val() * price);
+
+       $("#total-price").html(totalPrice.toFixed(2));  // SHOW BACK THE VALUE ON ELEMENT BY ID
+   }
+   ```
+
+9. Save everything and run project, try insert data on page Manage.    
+
+10. [Back to Menu](#create-read-update-delete)
 </BR>
 
 #### Update
