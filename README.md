@@ -355,7 +355,7 @@
 5. Open Manage.cshtml and replace with this code :
 
    ```HTML+Razor
-   @page "{handler?}"
+   @page "{handler?}/{id?}"
    @model ManageModel
    @{
        ViewData["Title"] = "Manage";
@@ -501,7 +501,7 @@
 
 7. Insert this code inside file ***InputModel.cs*** :
    
-   Above this code line ***namespace TrainingRazor.Models***
+   Above this code ***namespace TrainingRazor.Models***
    
    ```C#
    using System.ComponentModel.DataAnnotations;
@@ -597,7 +597,9 @@
    
      > ![image](https://user-images.githubusercontent.com/47632993/206384393-e84ab4aa-f387-4f5b-a06d-06fa0086f984.png)
 
-10. [Back to Menu](#create-read-update-delete)
+10. You also can try login on Admin account and try insert a new product.
+
+11. [Back to Menu](#create-read-update-delete)
 </BR>
 
 #### Update
