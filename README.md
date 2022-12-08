@@ -348,6 +348,9 @@
    > ![image](https://user-images.githubusercontent.com/47632993/206109703-a6d9f556-57cf-4ec7-bfe3-83f8b17ef87e.png)
 
 3. Below alert will popup; insert ***Manage*** and click Enter button on keyboard.
+
+   > ![image](https://user-images.githubusercontent.com/47632993/206387433-8106d269-a3ff-4094-887d-31f42cb21dca.png)
+   
 4. You can see on Pages folder, there are 2 new file created called Manage.cshtml ***(View)*** and Manage.cshtml.cs ***(View-Model)***
 
    > ![image](https://user-images.githubusercontent.com/47632993/206110357-0daed18c-50a7-4598-a94c-1cadbc76838a.png)
