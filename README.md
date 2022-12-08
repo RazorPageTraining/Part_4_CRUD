@@ -134,7 +134,7 @@
                            <th class="text-center col-md-2 dont-sort">NO</th>
                            <th class="text-center col-md-5 sort-this">PRODUCT NAME</th>
                            <th class="text-center col-md-3">PRICE</th>
-                           <th class="text-center col-md-2"></th>
+                           <th class="text-center col-md-2 dont-sort"></th>
                        }
                        else if(User.IsInRole("Customer"))
                        {
@@ -142,7 +142,7 @@
                            <th class="text-center col-md-5 sort-this">PRODUCT NAME</th>
                            <th class="text-center col-md-3">QUANTITY</th>
                            <th class="text-center col-md-2">TOTAL PRICE</th>
-                           <th class="text-center col-md-2"></th>
+                           <th class="text-center col-md-2 dont-sort"></th>
                        }
                    </tr>
                </thead>
@@ -371,7 +371,6 @@
            <form method="post">
                @if(User.IsInRole("Customer"))
                {
-                   <input type="hidden" asp-for="InputCustPurchasing.Creator">
                    <div class="form-group mt-3">
                        <label asp-for="InputCustPurchasing.ProductId" class="col-form-label"></label>
                        <select asp-for="InputCustPurchasing.ProductId" class="form-control">
@@ -421,7 +420,7 @@
    }
    ```
 
-6. Then, open Manage.cshtml.cs and replace this code
+6. Then, open Manage.cshtml.cs and replace with this code :
    
    ```C#
    using Microsoft.AspNetCore.Mvc;
@@ -451,16 +450,11 @@
 
            public async Task<IActionResult> OnGetInsert()
            {
-               var currentUser = await GetCurrentUser(); //CALL METHOD FROM BaseModel
-
                if(User.IsInRole("Customer"))
                {
                    products = await _context.Products.ToListAsync();
 
                    InputCustPurchasing = new InputCustPurchasingModel()
-                   {
-                       Creator =  currentUser
-                   };
                }
                else if(User.IsInRole("SystemAdmin"))
                {
@@ -473,11 +467,13 @@
            public async Task<ActionResult> OnPost()
            {
                if(User.IsInRole("Customer"))
-               {
+               {  
+                   var currentUser = await GetCurrentUser(); //CALL METHOD FROM BaseModel
+                   
                    //INSERT INPUT DATA FROM INPUT ENTITY MODEL, INSIDE DATABASE ENTITY MODEL
                    var custPurchased = new CustPurchased()
                    {
-                       Creator = InputCustPurchasing.Creator,
+                       Creator = currentUser,
                        ProductId = InputCustPurchasing.ProductId,
                        Quantity = InputCustPurchasing.Quantity
                    };
@@ -502,6 +498,51 @@
        }
    }
    ```
+
+7. Insert this code inside file ***InputModel.cs*** :
+   
+   Above this code line ***namespace TrainingRazor.Models***
+   
+   ```C#
+   using System.ComponentModel.DataAnnotations;
+   using System.ComponentModel.DataAnnotations.Schema;
+   ```
+   
+   > ![image](https://user-images.githubusercontent.com/47632993/206382419-5ba1b787-5e06-4477-b2cd-1badc7ab3749.png)
+
+   
+   Below CustProductModel class :
+   
+   ```C#
+   public class InputCustPurchasingModel
+   {
+       public ApplicationUser Creator { get; set; }
+
+       [Required(ErrorMessage = "Please select Product")]
+       [Display(Name = "Product")]
+       public int? ProductId { get; set; }
+
+       [Required(ErrorMessage = "Please insert Quantity")]
+       [Range(1, 999999999999, ErrorMessage = "Insert at least 1 quantity")]
+       [Display(Name = "Quantity")]
+       public int Quantity { get; set; }
+   }
+
+   public class InputProductModel
+   {
+       [StringLength(500)]
+       [Required(ErrorMessage = "Please insert product name")]
+       [Display(Name = "Product Name")]
+       public string Name { get; set; }
+
+       [Column(TypeName = "decimal(18, 2)")]
+       [Required(ErrorMessage = "Please insert product price")]
+       [Display(Name = "Product Price (RM)")]
+       public decimal Price { get; set; }
+   }
+   ```
+   
+   > ![image](https://user-images.githubusercontent.com/47632993/206382545-26ecedf0-eecc-4c60-843f-78c4339b5a20.png)
 
 7. Do not run the project yet, now, we gonna create a new js file inside js folder called ***manage.js***
    
@@ -542,7 +583,19 @@
    }
    ```
 
-9. Save everything and run project, try insert data on page Manage.    
+9. Save everything and run project, try insert data on page Manage by click the ***Insert*** button. If everything is okay, you can see the data inserted inside table/database.
+   
+   - Click ***Insert*** button
+      
+     > ![image](https://user-images.githubusercontent.com/47632993/206383891-8e7fe064-75de-46e6-b5f6-baac16667e6a.png)
+     
+   - Insert required information and click ***Save*** button
+     
+     > ![image](https://user-images.githubusercontent.com/47632993/206384079-7b606093-67fe-4dec-80f3-284ad2cd65b2.png)
+   
+   - You can see your data inside table
+   
+     > ![image](https://user-images.githubusercontent.com/47632993/206384393-e84ab4aa-f387-4f5b-a06d-06fa0086f984.png)
 
 10. [Back to Menu](#create-read-update-delete)
 </BR>
