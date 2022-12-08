@@ -408,7 +408,7 @@
 
                <div class="form-group mt-4">
                    <a asp-page="/Index" class="btn btn-primary mr-3">Back</a>
-                   <button type="submit" class="btn btn-success ml-3">Save</button>
+                   <button type="submit" asp-page-handler="Save" class="btn btn-success ml-3">Save</button>
                </div>
            </form>
        </div>
@@ -464,7 +464,7 @@
                return Page();
            }
 
-           public async Task<ActionResult> OnPost()
+           public async Task<ActionResult> OnPostSave()
            {
                if(User.IsInRole("Customer"))
                {  
