@@ -568,7 +568,7 @@
            Calculate();  //CALL METHOD 
        });
          
-       // BLUR FUNCTION; HWN INPUT LOSE FOCUS, FIXED THE VALUE TO 2 DECIMAL PLACES  
+       // BLUR FUNCTION; WHEN INPUT LOSE FOCUS, FIXED THE VALUE TO 2 DECIMAL PLACES  
        $("#InputProduct_Price").blur(function(){
            var value = parseFloat(this.value);
            $(this).val(value.toFixed(2));
