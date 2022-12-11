@@ -125,6 +125,31 @@
        <div align="left" class="mt-5 mb-4">
            <a asp-page="Manage" asp-page-handler="Insert" class="btn btn-primary">Insert</a>
        </div>
+       
+       @if(TempData["error"]!=null)
+       {
+           <div class="alert alert-danger d-flex align-items-center alert-dismissible fade show" role="alert">
+               <i class="fa fa-exclamation-triangle text-danger" aria-hidden="true"></i>
+               &emsp;
+               <div>
+                   <span>@TempData["error"]</span>
+                   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+               </div>
+           </div>
+       }
+
+       @if(TempData["success"]!=null)
+       {
+           <div class="alert alert-success d-flex align-items-center alert-dismissible fade show" role="alert">
+               <i class="fa fa-check-circle text-success" aria-hidden="true"></i>
+               &emsp;
+               <div>
+                   <span>@TempData["success"]</span>
+                   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+               </div>
+           </div>
+       }
+       
        <div class="table-responsive">
            <table id="data" class="display table table-striped table-bordered">
                <thead>
@@ -495,6 +520,8 @@
                }
 
                await _context.SaveChangesAsync();  //SAVE DATA INTO DATABASE
+               
+               TempData["success"] = "Success to insert";
 
                return RedirectToPage("Index");  //REDIRECT SYSTEM TO PAGE INDEX
            }
@@ -660,37 +687,44 @@
    ```C#
    public async Task<IActionResult> OnGetUpdate(int? id)
    {
-       IsUpdate = true;
+      if(id != null)
+      {
+          IsUpdate = true;
 
-       if(User.IsInRole("Customer"))
-       {
-           products = await _context.Products.ToListAsync();
-           var purchased = await _context.CustPurchaseds.FirstOrDefaultAsync(x => x.Id == id);
-           InputCustPurchasing = new InputCustPurchasingModel()
-           {
-               Id = purchased.Id,
-               ProductId = purchased.ProductId,
-               Quantity = purchased.Quantity ?? 0
-           };
-       }
-       else if(User.IsInRole("SystemAdmin"))
-       {
-           var product = await _context.Products.FirstOrDefaultAsync(x => x.Id == id);
-           InputProduct = new InputProductModel()
-           {
-               Id = product.Id,
-               Name = product.Name,
-               Price = product.Price
-            };
-       }
+          if(User.IsInRole("Customer"))
+          {
+              products = await _context.Products.ToListAsync();
+              var purchased = await _context.CustPurchaseds.FirstOrDefaultAsync(x => x.Id == id);
+              InputCustPurchasing = new InputCustPurchasingModel()
+              {
+                  Id = purchased.Id,
+                  ProductId = purchased.ProductId,
+                  Quantity = purchased.Quantity ?? 0
+              };
+          }
+          else if(User.IsInRole("SystemAdmin"))
+          {
+              var product = await _context.Products.FirstOrDefaultAsync(x => x.Id == id);
+              InputProduct = new InputProductModel()
+              {
+                  Id = product.Id,
+                  Name = product.Name,
+                  Price = product.Price
+              };
+          }
+      }
+      else
+      {
+          return RedirectToPage("/Index");
+      }
 
-       return Page();
+      return Page();
    }
    ```
    
    like this
    
-   > ![image](https://user-images.githubusercontent.com/47632993/206887143-9f8c5233-62fd-45d4-8761-95fd22d9c10b.png)
+   > ![image](https://user-images.githubusercontent.com/47632993/206890580-2fdbaba4-fafa-43f8-8790-9fe9474d8303.png)
    
    
    Moreover, insert this code below ***OnPostSave()*** handler method
@@ -720,6 +754,8 @@
         }
 
         await _context.SaveChangesAsync();  //SAVE DATA INTO DATABASE
+        
+        TempData["success"] = "Success to update";
 
         return RedirectToPage("Index");  //REDIRECT SYSTEM TO PAGE INDEX
    }
