@@ -620,7 +620,9 @@
    
    > ![image](https://user-images.githubusercontent.com/47632993/206885711-3c37dba1-30a3-4c06-ae78-ad5a0ae1bebe.png)
 
-2. Open ***Nanage.cshtml.cs*** file and insert this code. Insert between handler ***OnGetInsert()*** method and declaration of ***products*** like this :
+2. Open ***Manage.cshtml.cs*** file and insert this code
+
+   Insert between handler ***OnGetInsert()*** method and declaration of ***products***
    
    ```C#
    public bool IsUpdate { get; set; }  //VARIABLE BOOL TO KNOW IF THE CONDITIO IS UPDATE OR NOT
@@ -637,19 +639,23 @@
    }
    ```
    
+   like this
+   
    > ![image](https://user-images.githubusercontent.com/47632993/206886938-0c769ddf-1a1c-4111-8d4d-ed70b50e2505.png)
 
    
-   Then, insert this code inside ***OnGetInsert()*** handler method like this :
+   Then, insert this code inside ***OnGetInsert()*** handler method
    
    ```C#
    IsUpdate = false;
    ```
    
+   like this
+   
    > ![image](https://user-images.githubusercontent.com/47632993/206887058-2e66f023-ef2b-4543-9609-5201f0c41260.png)
 
    
-   After that, insert this code below ***OnGetInsert()*** handler method like this :
+   After that, insert this code below ***OnGetInsert()*** handler method
    
    ```C#
    public async Task<IActionResult> OnGetUpdate(int? id)
@@ -682,10 +688,12 @@
    }
    ```
    
+   like this
+   
    > ![image](https://user-images.githubusercontent.com/47632993/206887143-9f8c5233-62fd-45d4-8761-95fd22d9c10b.png)
    
    
-   Moreover, insert this code below ***OnPostSave()*** handler method like this :
+   Moreover, insert this code below ***OnPostSave()*** handler method
    
    ```C#
    public async Task<ActionResult> OnPostUpdate()
@@ -717,10 +725,110 @@
    }
    ```
    
+   like this
+   
    > ![image](https://user-images.githubusercontent.com/47632993/206887247-f144b5e5-236c-4f62-a06e-c9a719797006.png)
 
 
-0. [Back to Menu](#create-read-update-delete)
+3. Open ***Manage.cshtml*** and insert/edit this code
+
+   Change this code from
+   
+   ```HTML+Razor
+   <h1>
+       Insert Data
+   </h1>
+   ```
+   
+   to this
+   
+   ```HTML+Razor
+   <h1>
+      @if(Model.IsUpdate)
+      {
+          <span>Update</span>
+      }
+      else
+      {
+          <span>Insert</span>
+      }
+       Data
+   </h1>
+   ```
+   
+   
+   After that, insert this code
+   
+   ```HTML+Razor
+   <input type="hidden" asp-for="InputCustPurchasing.Id">
+   ```
+   
+   like this
+   
+   > ![image](https://user-images.githubusercontent.com/47632993/206887524-cf47a2ca-03be-4677-8cf1-9d70d1ab58f2.png)
+
+
+   Moreover, insert this code
+   
+   ```HTML+Razor
+    <input type="hidden" asp-for="InputProduct.Id">
+   ```
+   
+   like this
+   
+   > ![image](https://user-images.githubusercontent.com/47632993/206887573-100c5a38-e459-4bf4-9da4-6c8e91d99210.png)
+
+   
+   Futhermore, change this code from
+   
+   ```HTML+Razor
+   <div class="form-group mt-4">
+       <a asp-page="/Index" class="btn btn-primary mr-3">Back</a>
+       <button type="submit" asp-page-handler="Save" class="btn btn-success ml-3">Save</button>
+   </div>
+   ```
+   
+   to this
+   
+   ```HTML+Razor
+   <div class="form-group mt-4">
+       <a asp-page="/Index" class="btn btn-primary mr-3">Back</a>
+
+       @if(Model.IsUpdate)
+       {
+           <button type="submit" asp-page-handler="Update" class="btn btn-success ml-3">Update</button>
+       }
+       else
+       {
+           <button type="submit" asp-page-handler="Save" class="btn btn-success ml-3">Save</button>
+       }
+   </div>
+   ```
+   
+   
+3. Besides that, you need to edit ***manage.js*** for to running Calculate function when page Manage is loading. You can just insert ***Calculate();*** as below
+   
+   > ![image](https://user-images.githubusercontent.com/47632993/206887709-aff807fe-c0ef-4fe2-bbb9-f64501046241.png)
+
+
+4. You can save everything and run the project, from the list that you have on page Index, you can click the edit button
+   
+   > ![image](https://user-images.githubusercontent.com/47632993/206887738-7b0951cf-9603-444e-8c46-1ba91608631e.png)
+
+   after that, you can see the page redirect to page Manage, and data that you inserted is on input field
+   
+   > ![image](https://user-images.githubusercontent.com/47632993/206887787-e4a180fa-2cfa-40ca-814a-4cf555324d78.png)
+
+   try to change the input data and click the ***Update*** button
+   
+   > ![image](https://user-images.githubusercontent.com/47632993/206887810-5265489e-5277-435a-9805-d276dd781c9f.png)
+
+   system will redirect to page Index and you can see the data are changing
+   
+   > ![image](https://user-images.githubusercontent.com/47632993/206887857-5b2a3219-ed30-474f-8a10-967b79192d15.png)
+
+
+5. [Back to Menu](#create-read-update-delete)
 </BR>
 
 #### Delete
