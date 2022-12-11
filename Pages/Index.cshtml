@@ -1,0 +1,106 @@
+﻿@page "{handler?}/{id?}"
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+
+<div>
+    <div class="text-center mt-4">
+        <h1>Training Razor</h1>
+        <p>This Project consist of Create, Read, Update and Delete process.</p>
+    </div>
+
+    <div align="left" class="mt-5 mb-4">
+        <a asp-page="Manage" asp-page-handler="Insert" class="btn btn-primary">Insert</a>
+    </div>
+
+    @if(TempData["error"]!=null)
+    {
+        <div class="alert alert-danger d-flex align-items-center alert-dismissible fade show" role="alert">
+            <i class="fa fa-exclamation-triangle text-danger" aria-hidden="true"></i>
+            &emsp;
+            <div>
+                <span>@TempData["error"]</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </div>
+    }
+
+    @if(TempData["success"]!=null)
+    {
+        <div class="alert alert-success d-flex align-items-center alert-dismissible fade show" role="alert">
+            <i class="fa fa-check-circle text-success" aria-hidden="true"></i>
+            &emsp;
+            <div>
+                <span>@TempData["success"]</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        </div>
+    }
+
+    <div class="table-responsive">
+        <table id="data" class="display table table-striped table-bordered">
+            <thead>
+                <tr>
+                    @if(User.IsInRole("SystemAdmin"))
+                    {
+                        <th class="text-center col-md-2 dont-sort">NO</th>
+                        <th class="text-center col-md-5 sort-this">PRODUCT NAME</th>
+                        <th class="text-center col-md-3">PRICE</th>
+                        <th class="text-center col-md-2 dont-sort"></th>
+                    }
+                    else if(User.IsInRole("Customer"))
+                    {
+                        <th class="text-center col-md-2 dont-sort">NO</th>
+                        <th class="text-center col-md-5 sort-this">PRODUCT NAME</th>
+                        <th class="text-center col-md-3">QUANTITY</th>
+                        <th class="text-center col-md-2">TOTAL PRICE</th>
+                        <th class="text-center col-md-2 dont-sort"></th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @if(User.IsInRole("SystemAdmin"))
+                {
+                    @for(int i=0; i<Model.products.Count(); i++)
+                    {
+                        <tr>
+                            <td class="text-center"></td>
+                            <td class="text-center">@Model.products[i].Name</td>
+                            <td class="text-center">RM @string.Format("{0:F2}", (@Model.products[i].Price))</td>
+                            <form id="product" method="post">
+                                <td class="text-center">
+                                    <a class="btn btn-link" asp-page="Manage" asp-page-handler="Update" asp-route-id="@Model.products[i].Id"><i class="fa fa-edit" aria-hidden="true"></i></a>
+                                    <button class="btn btn-link text-danger" onclick="return ConfirmDelete()" asp-page-handler="Delete" asp-route-id="@Model.products[i].Id" type="submit"><i class="fa fa-trash" aria-hidden="true"></i></button>
+                                </td>
+                            </form>
+                        </tr>
+                    }
+                }
+                else if(User.IsInRole("Customer"))
+                {
+                    @for(int i=0; i<Model.custProducts.Count(); i++)
+                    {
+                        <tr>
+                            <td class="text-center"></td>
+                            <td class="text-center">@Model.custProducts[i].Name</td>
+                            <td class="text-center">@Model.custProducts[i].Quantity</td>
+                            <td class="text-center">RM @string.Format("{0:F2}", (@Model.custProducts[i].TotalPrice))</td>
+                            <form id="product" method="post">
+                                <td class="text-center">
+                                    <a class="btn btn-link" asp-page="Manage" asp-page-handler="Update" asp-route-id="@Model.custProducts[i].Id"><i class="fa fa-edit" aria-hidden="true"></i></a>
+                                    <button class="btn btn-link text-danger" onclick="return ConfirmDelete()" asp-page-handler="Delete" asp-route-id="@Model.custProducts[i].Id" type="submit"><i class="fa fa-trash" aria-hidden="true"></i></button>
+                                </td>
+                            </form>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/main.js"></script>
+}

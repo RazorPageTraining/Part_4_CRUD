@@ -1,0 +1,81 @@
+@page "{handler?}/{id?}"
+@model ManageModel
+@{
+    ViewData["Title"] = "Manage";
+}
+
+<div>
+    <div class="mt-4"> 
+        <h1>
+            @if(Model.IsUpdate)
+            {
+                <span>Update</span>
+            }
+            else
+            {
+                <span>Insert</span>
+            }
+             Data
+        </h1>
+    </div>
+    <div class="mt-2">
+        <form method="post">
+            @if(User.IsInRole("Customer"))
+            {
+                <input type="hidden" asp-for="InputCustPurchasing.Id">
+                <div class="form-group mt-3">
+                    <label asp-for="InputCustPurchasing.ProductId" class="col-form-label"></label>
+                    <select asp-for="InputCustPurchasing.ProductId" class="form-control">
+                        <option price="0.00" value="">Please Choose</option>
+                        @foreach(var item in Model.products)
+                        {
+                            <option price="@item.Price" value="@item.Id">@item.Name</option>
+                        }
+                    </select>
+                    <span asp-validation-for="InputCustPurchasing.ProductId" class="text-danger"></span>
+                </div>
+                <div class="form-group mt-3">
+                    <label asp-for="InputCustPurchasing.Quantity" class="col-form-label"></label>
+                    <input asp-for="InputCustPurchasing.Quantity" class="form-control">
+                    <span asp-validation-for="InputCustPurchasing.Quantity" class="text-danger"></span>
+                </div>
+                <div class="form-group mt-3">
+                    <label for="total-price" class="col-form-label">Total Price (RM)</label>
+                    <span id="total-price" class="form-control">0.00</span>
+                </div>
+            }
+            else if(User.IsInRole("SystemAdmin"))
+            {
+                <input type="hidden" asp-for="InputProduct.Id">
+                <div class="form-group mt-3">
+                    <label asp-for="InputProduct.Name" class="col-form-label"></label>
+                    <input asp-for="InputProduct.Name" class="form-control">
+                    <span asp-validation-for="InputProduct.Name" class="text-danger"></span>
+                </div>
+                <div class="form-group mt-3">
+                    <label asp-for="InputProduct.Price" class="col-form-label"></label>
+                    <input asp-for="InputProduct.Price" class="form-control">
+                    <span asp-validation-for="InputProduct.Price" class="text-danger"></span>
+                </div>
+            }
+
+            <div class="form-group mt-4">
+                <a asp-page="/Index" class="btn btn-primary mr-3">Back</a>
+
+                @if(Model.IsUpdate)
+                {
+                    <button type="submit" asp-page-handler="Update" class="btn btn-success ml-3">Update</button>
+                }
+                else
+                {
+                    <button type="submit" asp-page-handler="Save" class="btn btn-success ml-3">Save</button>
+                }
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+     <script src="~/js/manage.js"></script>
+}
