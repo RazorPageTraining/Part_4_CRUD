@@ -943,7 +943,7 @@
    
 3. Futhermore, open you ***main.js*** file and insert this code
 
-  ```JavaScript
+   ```JavaScript
    function ConfirmDelete()
    {
        return confirm("Are you sure you want to delete?");
