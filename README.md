@@ -869,5 +869,94 @@
 
 #### Delete
 
-0. [Back to Menu](#create-read-update-delete)
+1. Edit you ***Index.cshtml*** by inserting this code
+
+   ```HTML+Razor
+   onclick="return ConfirmDelete()"
+   ```
+   
+   on this code
+   
+   > ![image](https://user-images.githubusercontent.com/47632993/206894840-f6dc35a2-6d19-43eb-a03a-5d55faee1ad8.png)
+
+
+2. After that, insert this code on ***Index.cshtml.cs*** below ***OnGet()*** handler method
+   
+   ```C#
+   public async Task<IActionResult> OnPostDelete(int? id)
+   {
+        if(id!=null)
+        {
+            var currentUser = await GetCurrentUser();
+
+            if(User.IsInRole("Customer"))
+            {
+                var purchased = await _context.CustPurchaseds.Include(x => x.Creator)
+                                                              .FirstOrDefaultAsync(x => x.Id == id);
+
+                if(purchased!=null)
+                {
+                    if(purchased.Creator == currentUser)    //CHECK WHETHER CURRENTUSER IS THE ONE THAT PURCHASED IT
+                    {
+                        _context.CustPurchaseds.Remove(purchased);
+                    }
+                }
+                else
+                {
+                    TempData["error"] = "Purchased not found";
+
+                    return RedirectToPage();
+                }
+            }
+            else if(User.IsInRole("SystemAdmin"))
+            {
+                var purchased = await _context.CustPurchaseds.ToListAsync();
+                var product = await _context.Products.FirstOrDefaultAsync(x => x.Id == id);
+
+                if(product!=null)
+                {   
+                    for(int i = 0; i < purchased.Count; i++)    //LOOP THROUGH PURCHASED TABLE TO SEE WHETHER PRODUCTS BEEN PURCHASED
+                    {
+                        if(product.Id != purchased[i].ProductId)
+                        {
+                            _context.Products.Remove(product);
+                        }
+                        else
+                        {
+                            TempData["error"] = "Product been purchased";
+
+                            return RedirectToPage();
+                        }
+                    }
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            TempData["success"] = "Success to delete";
+        }
+
+        return RedirectToPage();
+   }
+   ```
+   
+   
+3. Futhermore, open you ***main.js*** file and insert this code
+
+  ```JavaScript
+   function ConfirmDelete()
+   {
+       return confirm("Are you sure you want to delete?");
+   }
+   ```
+   
+   like this
+   
+   > ![image](https://user-images.githubusercontent.com/47632993/206895124-0f9e5a9f-9d96-4be7-8e06-57343ea82424.png)
+
+
+4. Run your project and see what happen.
+
+
+5. [Back to Menu](#create-read-update-delete)
 </BR>
