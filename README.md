@@ -608,7 +608,117 @@
 
 #### Update
 
-1. 
+1. Insert this code on ***InputModel.cs*** file
+   
+   ```C#
+   public int Id { get; set; }
+   ```
+   
+   Insert on both entity model class like this and save the file :
+   
+   > ![image](https://user-images.githubusercontent.com/47632993/206885694-175b84b3-74d2-4f7e-8a9f-b8f7f8011120.png)
+   
+   > ![image](https://user-images.githubusercontent.com/47632993/206885711-3c37dba1-30a3-4c06-ae78-ad5a0ae1bebe.png)
+
+2. Open ***Nanage.cshtml.cs*** file and insert this code. Insert between handler ***OnGetInsert()*** method and declaration of ***products*** like this :
+   
+   ```C#
+   public bool IsUpdate { get; set; }  //VARIABLE BOOL TO KNOW IF THE CONDITIO IS UPDATE OR NOT
+
+   // WILL BE RUN ON PAGE LOADING WITHOUT LOADING WITH HANDLER
+   public async Task<IActionResult> OnGet()
+   {
+       IsUpdate = false;
+       products = await _context.Products.ToListAsync();
+       InputCustPurchasing = new InputCustPurchasingModel();
+       InputProduct = new InputProductModel();
+
+       return Page();
+   }
+   ```
+   
+   > ![image](https://user-images.githubusercontent.com/47632993/206886938-0c769ddf-1a1c-4111-8d4d-ed70b50e2505.png)
+
+   
+   Then, insert this code inside ***OnGetInsert()*** handler method like this :
+   
+   ```C#
+   IsUpdate = false;
+   ```
+   
+   > ![image](https://user-images.githubusercontent.com/47632993/206887058-2e66f023-ef2b-4543-9609-5201f0c41260.png)
+
+   
+   After that, insert this code below ***OnGetInsert()*** handler method like this :
+   
+   ```C#
+   public async Task<IActionResult> OnGetUpdate(int? id)
+   {
+       IsUpdate = true;
+
+       if(User.IsInRole("Customer"))
+       {
+           products = await _context.Products.ToListAsync();
+           var purchased = await _context.CustPurchaseds.FirstOrDefaultAsync(x => x.Id == id);
+           InputCustPurchasing = new InputCustPurchasingModel()
+           {
+               Id = purchased.Id,
+               ProductId = purchased.ProductId,
+               Quantity = purchased.Quantity ?? 0
+           };
+       }
+       else if(User.IsInRole("SystemAdmin"))
+       {
+           var product = await _context.Products.FirstOrDefaultAsync(x => x.Id == id);
+           InputProduct = new InputProductModel()
+           {
+               Id = product.Id,
+               Name = product.Name,
+               Price = product.Price
+            };
+       }
+
+       return Page();
+   }
+   ```
+   
+   > ![image](https://user-images.githubusercontent.com/47632993/206887143-9f8c5233-62fd-45d4-8761-95fd22d9c10b.png)
+   
+   
+   Moreover, insert this code below ***OnPostSave()*** handler method like this :
+   
+   ```C#
+   public async Task<ActionResult> OnPostUpdate()
+   {
+        if(User.IsInRole("Customer"))
+        {
+             var purchased = await _context.CustPurchaseds.FirstOrDefaultAsync(x => x.Id == InputCustPurchasing.Id);
+                
+             if(purchased!=null)
+             {
+                  purchased.ProductId = InputCustPurchasing.ProductId;    //UPDATE INFORMATION
+                  purchased.Quantity = InputCustPurchasing.Quantity;
+             }
+        }
+        else if(User.IsInRole("SystemAdmin"))
+        {
+             var product = await _context.Products.FirstOrDefaultAsync(x => x.Id == InputProduct.Id);
+
+             if(product!=null)
+             {
+                  product.Name = InputProduct.Name;
+                  product.Price = InputProduct.Price;
+             }
+        }
+
+        await _context.SaveChangesAsync();  //SAVE DATA INTO DATABASE
+
+        return RedirectToPage("Index");  //REDIRECT SYSTEM TO PAGE INDEX
+   }
+   ```
+   
+   > ![image](https://user-images.githubusercontent.com/47632993/206887247-f144b5e5-236c-4f62-a06e-c9a719797006.png)
+
 
 0. [Back to Menu](#create-read-update-delete)
 </BR>
