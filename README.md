@@ -44,6 +44,8 @@
    > What is [Datatable](https://datatables.net/)?
 
    > What is [FontAwesome](https://fontawesome.com/v4.7/)?
+   
+   > Test [FontAwesome v4](https://fontawesome.com/v4/icons/)
 
 2. Insert the Datatable library and FontAwesome inside folder lib on wwwroot folder.
    
