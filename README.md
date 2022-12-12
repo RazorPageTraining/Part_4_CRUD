@@ -871,7 +871,7 @@
 
 1. Edit you ***Index.cshtml*** by inserting this code
 
-   ```HTML+Razor
+   ```JavaScript
    onclick="return ConfirmDelete()"
    ```
    
@@ -955,7 +955,7 @@
    > ![image](https://user-images.githubusercontent.com/47632993/206895124-0f9e5a9f-9d96-4be7-8e06-57343ea82424.png)
 
 
-4. Run your project and see what happen.
+4. Run your project and try to delete some information.
 
 
 5. [Back to Menu](#create-read-update-delete)
